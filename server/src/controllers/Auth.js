@@ -132,7 +132,7 @@ module.exports = {
                   };
 
                   const token = issueToken(payload);
-                //   console.log(token, "GETTING TOKEN");
+                  //   console.log(token, "GETTING TOKEN");
 
                   return res.status(Constant.SUCCESS).json({
                     success: true,
