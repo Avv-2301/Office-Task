@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Constant = require("../services/Constant");
 const bcrypt = require("bcryptjs");
+const { issueToken } = require("../services/Userjwt");
 
 const {
   userSignUpValidation,
@@ -22,6 +23,7 @@ module.exports = {
         !requestParams.name ||
         !requestParams.email ||
         !requestParams.password ||
+        !requestParams.accountType ||
         !requestParams.confirmPassword
       ) {
         return res.status(Constant.FAIL).json({
@@ -71,6 +73,94 @@ module.exports = {
               success: true,
               response,
               message: "Sign-Up Successfull",
+            });
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  /**
+   * @description "This function is for user login"
+   * @param req
+   * @param res
+   */
+
+  login: async (req, res) => {
+    try {
+      const requestParams = req.body;
+      console.log(requestParams, "LOGIN");
+
+      if (!requestParams.email || !requestParams.password) {
+        return res.status(Constant.FAIL).json({
+          sucess: false,
+          message: "All Fields Required",
+        });
+      }
+
+      loginValidation(requestParams, res, async (validate) => {
+        if (validate) {
+          const user = await User.findOne({
+            email: requestParams?.email,
+          });
+          console.log(user, "USERDATA");
+
+          if (
+            (user && user?.role === Constant.ROLE.USER) ||
+            Constant.ROLE.MANAGER
+          ) {
+            if (user && user.verified !== null) {
+              if (user && user?.status === Constant.ACTIVE) {
+                const comparePassword = await bcrypt.compare(
+                  requestParams.password,
+                  user.password
+                );
+                if (comparePassword) {
+                  const userExpTime =
+                    Math.floor(Date.now() / 1000) + 5 * 24 * 3600;
+
+                  const payload = {
+                    id: user?._id,
+                    role: user?.role,
+                    expiry: userExpTime,
+                  };
+
+                  const token = issueToken(payload);
+                //   console.log(token, "GETTING TOKEN");
+
+                  return res.status(Constant.SUCCESS).json({
+                    success: true,
+                    user,
+                    message: "Account is Inactive",
+                  });
+                } else {
+                  return res.status(Constant.UNAUTHORIZED).json({
+                    success: false,
+                    message: "Password is incorrect",
+                  });
+                }
+              } else {
+                return res.status(Constant.FAIL).json({
+                  success: false,
+                  message: "Account is Inactive",
+                });
+              }
+            } else {
+              return res.status(Constant.FAIL).json({
+                success: false,
+                message: "User not verified",
+              });
+            }
+          } else {
+            return res.status(Constant.FAIL).json({
+              success: false,
+              message: "User Not Found",
             });
           }
         }

@@ -5,6 +5,9 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const http = require("http");
 require("dotenv").config();
+const { userAuthToken } = require("./src/middlewares/User");
+
+const userAuth = require("./src/routes/UserAuth");
 
 const port = process.env.PORT || 8080;
 
@@ -24,6 +27,8 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   next();
 });
+
+app.use("/api/v1/auth", userAuth);
 
 const { connect } = require("./src/config/Database");
 connect();

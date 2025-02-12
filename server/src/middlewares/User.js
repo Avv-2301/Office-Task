@@ -1,7 +1,6 @@
 const jwToken = require("../services/userJwt");
-const Response = require("../services/Response");
 const Constant = require("../services/Constant");
-const User = require("../models/user");
+const User = require("../models/User");
 
 module.exports = {
   /**
@@ -13,11 +12,10 @@ module.exports = {
     try {
       const token = req.headers.authorization;
       if (!token) {
-        return Response.errorResponseWithoutData(
-          res,
-          "Authorization error",
-          Constant.UNAUTHORIZED
-        );
+        return res.status(Constant.UNAUTHORIZED).json({
+          success: false,
+          message: "Authorization error",
+        });
       } else {
         const tokenData = await jwToken.decode(token);
         if (tokenData) {
@@ -36,50 +34,44 @@ module.exports = {
 
             if (user && user_token === token) {
               if (user && user.status === Constant.INACTIVE) {
-                return Response.errorResponseWithoutData(
-                  res,
-                  "User account is Inactive",
-                  Constant.UNAUTHORIZED
-                );
+                return res.status(Constant.FAIL).json({
+                  success: false,
+                  message: "User account is Inactive",
+                });
               }
               if (user && user.status === Constant.ACTIVE) {
                 return next();
               } else {
-                return Response.errorResponseWithoutData(
-                  res,
-                  "Account is blocked",
-                  Constant.UNAUTHORIZED
-                );
+                return res.status(Constant.FAIL).json({
+                  success: false,
+                  message: "Account is blocked",
+                });
               }
             } else {
-              return Response.errorResponseWithoutData(
-                res,
-                "Invalid token 1",
-                Constant.UNAUTHORIZED
-              );
+              return res.status(Constant.FAIL).json({
+                success: false,
+                message: "Invalid Token 1",
+              });
             }
           } else {
-            return Response.errorResponseWithoutData(
-              res,
-              "Invalid token 2",
-              Constant.UNAUTHORIZED
-            );
+            return res.status(Constant.FAIL).json({
+              success: false,
+              message: "Invalid Token 2",
+            });
           }
         } else {
-          return Response.errorResponseWithoutData(
-            res,
-            "Invalid token 3",
-            Constant.UNAUTHORIZED
-          );
+          return res.status(Constant.FAIL).json({
+            success: false,
+            message: "Invalid Token 3",
+          });
         }
       }
     } catch (error) {
       console.log(error);
-      return Response.errorResponseData(
-        res,
-        "Internal Server error",
-        Constant.INTERNAL_SERVER
-      );
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
     }
   },
 };

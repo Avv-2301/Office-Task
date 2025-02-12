@@ -11,6 +11,7 @@ module.exports = {
     const schema = Joi.object({
       name: Joi.string().trim().required(),
       email: Joi.string().email().trim().required(),
+      accountType: Joi.string().trim().required(),
       password: Joi.string().trim().min(8).required(),
       confirmPassword: Joi.string().trim().min(8).required(),
     });
