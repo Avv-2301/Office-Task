@@ -1,4 +1,4 @@
-const jwToken = require("../services/userJwt");
+const jwToken = require("../services/Userjwt");
 const Constant = require("../services/Constant");
 const User = require("../models/User");
 

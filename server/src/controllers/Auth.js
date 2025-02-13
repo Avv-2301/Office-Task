@@ -16,15 +16,15 @@ module.exports = {
    */
   signUp: async (req, res) => {
     try {
-      const requestParams = req.body;
+      const { requestParams } = req.body;
       console.log(requestParams, "SIGN-UP PARAMS");
 
       if (
-        !requestParams.name ||
-        !requestParams.email ||
-        !requestParams.password ||
-        !requestParams.accountType ||
-        !requestParams.confirmPassword
+        !requestParams?.name ||
+        !requestParams?.email ||
+        !requestParams?.password ||
+        !requestParams?.accountType ||
+        !requestParams?.confirmPassword
       ) {
         return res.status(Constant.FAIL).json({
           success: false,
@@ -94,7 +94,7 @@ module.exports = {
 
   login: async (req, res) => {
     try {
-      const requestParams = req.body;
+      const { requestParams } = req.body;
       console.log(requestParams, "LOGIN");
 
       if (!requestParams.email || !requestParams.password) {
@@ -109,7 +109,7 @@ module.exports = {
           const user = await User.findOne({
             email: requestParams?.email,
           });
-          console.log(user, "USERDATA");
+          // console.log(user, "USERDATA");
 
           if (
             (user && user?.role === Constant.ROLE.USER) ||
@@ -133,6 +133,17 @@ module.exports = {
 
                   const token = issueToken(payload);
                   //   console.log(token, "GETTING TOKEN");
+
+                  await user.updateOne(
+                    { _id: user._id },
+                    {
+                      $set: {
+                        last_login: new Date(),
+                        token,
+                        tokenExpiresAt: userExpTime,
+                      },
+                    }
+                  );
 
                   return res.status(Constant.SUCCESS).json({
                     success: true,
