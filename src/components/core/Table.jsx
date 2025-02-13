@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getDepartment } from "../../services/taskApi";
+import { deleteDepartment, getDepartment } from "../../services/taskApi";
 
 const DepartmentTable = () => {
   const [data, setData] = useState([]);
@@ -13,8 +13,10 @@ const DepartmentTable = () => {
     alert(`Edit department with ID: ${id}`);
   };
 
-  const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
+  const handleDelete = async(id) => {
+    console.log(id)
+    const deleteResponse = await deleteDepartment(id, token);
+    // console.log(deleteResponse);
   };
 
   const fetchDepartment = async () => {
@@ -87,7 +89,7 @@ const DepartmentTable = () => {
                     </button>
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(item._id)}
                     >
                       Delete
                     </button>

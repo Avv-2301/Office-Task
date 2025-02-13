@@ -59,3 +59,31 @@ export const getDepartment = async (token) => {
   toast.dismiss(toastId);
   return result;
 };
+
+export const deleteDepartment = async (departmentId, token) => {
+  let result = [];
+  const toastId = toast.loading("Loading...");
+  try {
+    const response = await axios.delete(
+      `http://localhost:4000/api/v1/task/delete-department?departmentId=${departmentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.data.success) {
+      throw new Error(response.data.message);
+    }
+
+    result = response.data.data;
+
+    toast.success("Department deleted Successfully");
+    window.location.reload()
+  } catch (error) {
+    console.log("DELETE DEPARTMENT API ERROR............", error);
+    toast.error("DELETE Failed");
+  }
+  toast.dismiss(toastId);
+  return result;
+};
