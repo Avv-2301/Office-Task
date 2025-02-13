@@ -1,8 +1,11 @@
-import React from 'react'
+import React from 'react';
+import Table from '../components/core/Table';
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <div>
+      <Table/>
+    </div>
   )
 }
 

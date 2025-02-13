@@ -14,7 +14,7 @@ module.exports = {
       const authUserId = req.authUserId;
       console.log(authUserId, "id from middleware");
 
-      const requestParams = req.body;
+      const { requestParams } = req.body;
       console.log(requestParams);
 
       if (
@@ -49,8 +49,9 @@ module.exports = {
 
           const response = await Department.create(department_obj);
 
-          return res.status(Constant.FAIL).json({
+          return res.status(Constant.SUCCESS).json({
             success: true,
+            data: response,
             message: "Department created successfully",
           });
         } else {

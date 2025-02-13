@@ -8,6 +8,7 @@ require("dotenv").config();
 const { userAuthToken } = require("./src/middlewares/User");
 
 const userAuth = require("./src/routes/UserAuth");
+const managerTask = require("./src/routes/ManagerTask");
 
 const port = process.env.PORT || 8080;
 
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/v1/auth", userAuth);
+app.use("/api/v1/task", userAuthToken, managerTask);
 
 const { connect } = require("./src/config/Database");
 connect();
