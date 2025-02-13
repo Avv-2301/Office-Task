@@ -74,4 +74,47 @@ module.exports = {
       });
     }
   },
+
+  /**
+   * @decsription This function is used to get departments
+   * @param req
+   * @param res
+   */
+
+  getDepartments: async (req, res) => {
+    try {
+      const authUserId = req.authUserId;
+      console.log(authUserId, "id from middleware");
+
+      const user = await User.findOne(
+        {
+          $and: [{ status: Constant.ACTIVE }, { _id: authUserId }],
+        },
+        { verified: 1, role: 1 }
+      );
+
+      console.log(user, "getting user");
+
+      if (user && user.verified !== null) {
+        const response = await Department.find();
+
+        return res.status(Constant.SUCCESS).json({
+          success: true,
+          data: response,
+          message: "Department find successfully",
+        });
+      } else {
+        return res.status(Constant.FAIL).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
 };

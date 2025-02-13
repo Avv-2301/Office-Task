@@ -33,11 +33,11 @@ export default function AddDepartmentForm() {
             className="w-full mt-1 p-2 border rounded-md bg-white"
           >
             <option value="">Select Department</option>
-            <option value="HR">Google IT Solutions</option>
-            <option value="Finance">ipangram</option>
-            <option value="Engineering">facebook</option>
-            <option value="Marketing">wipro</option>
-            <option value="Marketing">walmart</option>
+            <option value="Google IT Solutions">Google IT Solutions</option>
+            <option value="ipangram">ipangram</option>
+            <option value="facebook">facebook</option>
+            <option value="wipro">wipro</option>
+            <option value="walmart">walmart</option>
           </select>
           {errors.departmentName && (
             <p className="text-red-500 text-sm mt-1">
@@ -55,8 +55,8 @@ export default function AddDepartmentForm() {
             className="w-full mt-1 p-2 border rounded-md bg-white"
           >
             <option value="">Select Category</option>
-            <option value="Full-Time">HR</option>
-            <option value="Part-Time">IT</option>
+            <option value="HR">HR</option>
+            <option value="IT">IT</option>
             <option value="sales">Sales</option>
             <option value="Product">Product</option>
             <option value="Marketing">Marketing</option>
