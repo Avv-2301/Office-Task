@@ -6,6 +6,7 @@ const { issueToken } = require("../services/Userjwt");
 const {
   userSignUpValidation,
   loginValidation,
+  logoutValidation,
 } = require("../services/UserValidation");
 
 module.exports = {
@@ -174,6 +175,44 @@ module.exports = {
               message: "User Not Found",
             });
           }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  /**
+   * @description "This function is for user logout"
+   * @param req
+   * @param res
+   */
+
+  logout: async (req, res) => {
+    try {
+      const requestParams = req.body;
+      // console.log(requestParams, "LOGOUT");
+      logoutValidation(requestParams, res, async (validate) => {
+        if (validate) {
+          await User.updateOne(
+            {
+              _id: requestParams.user_id,
+            },
+            {
+              $set: {
+                token: null,
+                tokenExpiresAt: null,
+              },
+            }
+          );
+          return res.status(Constant.SUCCESS).json({
+            success: false,
+            message: "Logout Successfull",
+          });
         }
       });
     } catch (error) {

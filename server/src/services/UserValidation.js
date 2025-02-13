@@ -45,4 +45,24 @@ module.exports = {
     }
     return callback(true);
   },
+
+  /**
+   * @description This function is to validate the fields for logout function
+   * @param req
+   * @param res
+   */
+
+  logoutValidation: (req, res, callback) => {
+    const schema = Joi.object({
+      user_id: Joi.string().trim().required(),
+    });
+    const { error } = schema.validate(req);
+    if (error) {
+      return res.status(Constant.NOT_ACCEPTABLE).json({
+        success: false,
+        message: "Validation Failed",
+      });
+    }
+    return callback(true);
+  },
 };
