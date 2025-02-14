@@ -50,17 +50,18 @@ export function login(formData, navigate) {
           },
         }
       );
-      // console.log("login api response", response);
+      console.log("login api response", response);
       if (!response.data.success) {
         throw new Error(response.data.message);
       }
-      toast.success("Login successfull");
-      dispatch(setToken(response.data.user.token));
-      dispatch(setUser({ ...response.data.user }));
 
-      localStorage.setItem("token", JSON.stringify(response.data.user.token));
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      const role = response.data.user.role;
+      toast.success("Login successfull");
+      dispatch(setToken(response?.data?.data?.token));
+      dispatch(setUser({ ...response.data.data }));
+
+      localStorage.setItem("token", JSON.stringify(response?.data?.data?.token));
+      localStorage.setItem("user", JSON.stringify(response.data.data));
+      const role = response.data.data.role;
       if (role === "user") {
         navigate("/dashboard-user");
       } else {

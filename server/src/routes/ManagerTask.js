@@ -4,12 +4,16 @@ const {
   getDepartments,
   deleteDepartment,
   assignEmployees,
+  getAllEmployees,
+  getEmployeesById,
 } = require("../controllers/ManagerTask");
 const router = express.Router();
 
 router.post("/create-department", createDepartment);
 router.get("/get-department", getDepartments);
 router.delete("/delete-department", deleteDepartment);
-router.post("/assign-employees", assignEmployees);
+router.put("/assign-employees", assignEmployees);
+router.get("/get-employees", getAllEmployees);
+router.get("/get-user", getEmployeesById)
 
 module.exports = router;

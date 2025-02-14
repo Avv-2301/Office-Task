@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getAllEmployeesById } from "../services/taskApi";
+import { useSelector } from "react-redux";
 
 const UserDashboard = () => {
-  const tasks = [
-    { id: 1, name: "Complete Report", role: "Manager", status: "Pending" },
-    { id: 2, name: "Fix Bug #101", role: "Developer", status: "In Progress" },
-  ];
+  const [data, setData] = useState([])
+  const { token } = useSelector((state) => state.auth);
 
+  const fetchUser = async() =>{
+    const response = await getAllEmployeesById(token);
+    console.log(response)
+    if(response){
+      setData(response)
+    }
+  }
+
+  useEffect(() =>{
+    fetchUser();
+  },[])
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Your Assigned Department</h2>
@@ -18,10 +29,10 @@ const UserDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id} className="text-center border">
-                <td className="py-2 px-4 border">{task.name}</td>
-                <td className="py-2 px-4 border">{task.name}</td>
+            {data.map((item, index) => (
+              <tr key={index} className="text-center border">
+                <td className="py-2 px-4 border">{item?.departmentName}</td>
+                <td className="py-2 px-4 border">{item?.categoryName}</td>
               </tr>
             ))}
           </tbody>

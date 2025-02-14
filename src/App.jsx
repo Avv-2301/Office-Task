@@ -6,13 +6,14 @@ import { Route, Routes } from "react-router-dom";
 import OpenRoute from "./components/Auth/OpenRoute";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import CreateDepartment from "./pages/CreateDepartment";
-import UserDashboard from './pages/UserDashboard';
-import Navbar from './components/core/Navbar';
+import UserDashboard from "./pages/UserDashboard";
+import Navbar from "./components/core/Navbar";
+import EditDepartment from "./pages/EditDepartment";
 
 const App = () => {
   return (
     <div>
-      <Navbar/>
+      <Navbar />
       <Routes>
         <Route
           path="/"
@@ -41,19 +42,16 @@ const App = () => {
         <Route
           path="/create-department"
           element={
-            <PrivateRoute>
               <CreateDepartment />
-            </PrivateRoute>
           }
         />
         <Route
           path="/dashboard-user"
           element={
-            <PrivateRoute>
               <UserDashboard />
-            </PrivateRoute>
           }
         />
+        <Route path="/edit-department/:id" element={<EditDepartment />} />
       </Routes>
     </div>
   );

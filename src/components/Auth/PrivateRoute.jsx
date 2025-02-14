@@ -7,9 +7,7 @@ const PrivateRoute = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    } else if (user.role === "user") {
+    if (user.role === "user") {
       navigate("/dashboard-user");
     } else {
       navigate("/dashboard");

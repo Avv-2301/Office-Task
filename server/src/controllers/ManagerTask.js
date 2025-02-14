@@ -96,7 +96,7 @@ module.exports = {
       //   console.log(user, "getting user");
 
       if (user && user.verified !== null) {
-        const response = await Department.find();
+        const response = await Department.find().populate("employees");
 
         return res.status(Constant.SUCCESS).json({
           success: true,
@@ -187,10 +187,10 @@ module.exports = {
   assignEmployees: async (req, res) => {
     try {
       const authUserId = req.authUserId;
-      console.log(authUserId, "id from middleware");
+      // console.log(authUserId, "id from middleware");
 
-      const { departmentId } = req.params.id;
-      console.log(departmentId, "getting department id");
+      const { departmentId } = req.query;
+      // console.log(departmentId, "getting department id");
 
       if (!departmentId) {
         return res.status(Constant.INTERNAL_SERVER).json({
@@ -199,10 +199,10 @@ module.exports = {
         });
       }
 
-      const { employeesId } = req.body;
-      console.log(employeesId, "Department id");
+      const employees = req.body.employeesId;
+      // console.log(employees, "employees id");
 
-      if (!employeesId) {
+      if (!employees) {
         return res.status(Constant.INTERNAL_SERVER).json({
           success: false,
           message: "employeesId not found",
@@ -220,18 +220,18 @@ module.exports = {
 
       if (user && user.verified !== null) {
         if (user.role === Constant.ROLE.MANAGER) {
-          const employees = await User.find({
-            _id: { $in: employeesId },
+          const getEmployees = await User.find({
+            _id: { $in: employees },
             role: "user",
           });
-          if (employees.length !== employeesId.length) {
+          if (employees.length !== employees.length) {
             return res
               .status(400)
               .json({ success: false, message: "Some employees not found." });
           }
           const updatedDepartment = await Department.findByIdAndUpdate(
             departmentId,
-            { $set: { employees: employeesId } },
+            { $set: { employees: getEmployees } },
             { new: true }
           ).populate("employees", "name email");
 
@@ -270,7 +270,50 @@ module.exports = {
   getAllEmployees: async (req, res) => {
     try {
       const authUserId = req.authUserId;
-      console.log(authUserId, "id from middleware");
+      // console.log(authUserId, "id from middleware");
+
+      const user = await User.findOne(
+        {
+          $and: [{ status: Constant.ACTIVE }, { _id: authUserId }],
+        },
+        { verified: 1, role: 1 }
+      );
+
+      // console.log(user, "getting user");
+
+      if (user && user.verified !== null) {
+        const response = await Department.find({ role: Constant.ROLE.USER });
+
+        return res.status(Constant.SUCCESS).json({
+          success: true,
+          data: response,
+          message: "User not found",
+        });
+      } else {
+        return res.status(Constant.FAIL).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  /**
+   * @description This function is used to get employees by id
+   * @param req
+   * @param res
+   */
+
+  getEmployeesById: async (req, res) => {
+    try {
+      const authUserId = req.authUserId;
+      console.log(authUserId);
 
       const user = await User.findOne(
         {
@@ -282,12 +325,12 @@ module.exports = {
       console.log(user, "getting user");
 
       if (user && user.verified !== null) {
-        const response = await User.find({ role: Constant.ROLE.USER });
+        const getUser = await Department.find({employees: authUserId}).populate("employees");
 
         return res.status(Constant.SUCCESS).json({
           success: true,
-          data: response,
-          message: "User not found",
+          getUser,
+          message: "user found",
         });
       } else {
         return res.status(Constant.FAIL).json({

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -8,11 +9,13 @@ function OpenRoute({ children }) {
   if (token === null) {
     return children;
   } else {
-    if (user.role === "user") {
-      navigate("/dashboard-user");
-    } else {
-      navigate("/dashboard");
-    }
+    useEffect(() => {
+      if (user.role === "user") {
+        navigate("/dashboard-user");
+      } else {
+        navigate("/dashboard");
+      }
+    }, [token, user, navigate]);
   }
 }
 

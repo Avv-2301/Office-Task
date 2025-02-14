@@ -2,26 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { deleteDepartment, getDepartment } from "../../services/taskApi";
+import { useNavigate } from "react-router-dom";
 
 const DepartmentTable = () => {
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const { token } = useSelector((state) => state.auth);
-  const itemsPerPage = 2;
+  const navigate = useNavigate();
+  const itemsPerPage = 5;
 
   const handleEdit = (id) => {
-    alert(`Edit department with ID: ${id}`);
+    navigate(`/edit-department/${id}`);
   };
 
-  const handleDelete = async(id) => {
-    console.log(id)
+  const handleDelete = async (id) => {
+    console.log(id);
     const deleteResponse = await deleteDepartment(id, token);
     // console.log(deleteResponse);
   };
 
   const fetchDepartment = async () => {
     const response = await getDepartment(token);
-    // console.log(response);
+    console.log(response);
     if (response) {
       setData(response);
     }
@@ -63,7 +65,7 @@ const DepartmentTable = () => {
             <>No Departments</>
           ) : (
             <>
-              {data.map((item, index) => (
+              {paginatedData.map((item, index) => (
                 <tr key={index}>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.departmentName}
@@ -78,12 +80,16 @@ const DepartmentTable = () => {
                     {item.salary}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.employees.length === 0 ? (<>No Employees</>) : (item.employees)}
+                    {item.employees.length === 0 ? (
+                      <>No Employees</>
+                    ) : (
+                      item.employees?.[0]?.name
+                    )}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     <button
                       className="mr-2 bg-blue-500 text-white px-3 py-1 rounded-md"
-                      onClick={() => handleEdit(item.id)}
+                      onClick={() => handleEdit(item._id)}
                     >
                       Edit
                     </button>

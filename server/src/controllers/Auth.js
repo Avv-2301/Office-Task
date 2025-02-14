@@ -95,10 +95,10 @@ module.exports = {
 
   login: async (req, res) => {
     try {
-      const { requestParams } = req.body;
-      // console.log(requestParams, "LOGIN");
+      const {requestParams} = req.body;
+      console.log(requestParams, "LOGIN");
 
-      if (!requestParams.email || !requestParams.password) {
+      if (!requestParams?.email || !requestParams?.password) {
         return res.status(Constant.FAIL).json({
           sucess: false,
           message: "All Fields Required",
@@ -136,21 +136,23 @@ module.exports = {
                   const token = issueToken(payload);
                   // console.log(token, "GETTING TOKEN");
 
-                  await user.updateOne(
+                  const newuser = await User.findByIdAndUpdate(
                     { _id: user?._id },
                     {
                       $set: {
                         last_login: new Date(),
-                        token,
+                        token: token,
                         tokenExpiresAt: userExpTime,
                       },
                     },
                     { new: true }
                   );
 
+                  console.log(newuser);
+
                   return res.status(Constant.SUCCESS).json({
                     success: true,
-                    user,
+                    data: newuser,
                     message: "Login successfull",
                   });
                 } else {
