@@ -12,10 +12,10 @@ module.exports = {
   createDepartment: async (req, res) => {
     try {
       const authUserId = req.authUserId;
-    //   console.log(authUserId, "id from middleware");
+      //   console.log(authUserId, "id from middleware");
 
       const { requestParams } = req.body;
-    //   console.log(requestParams);
+      //   console.log(requestParams);
 
       if (
         !requestParams.departmentName ||
@@ -36,7 +36,7 @@ module.exports = {
         { verified: 1, role: 1 }
       );
 
-    //   console.log(user, "getting user");
+      //   console.log(user, "getting user");
 
       if (user && user.verified !== null) {
         if (user.role === Constant.ROLE.MANAGER) {
@@ -84,7 +84,7 @@ module.exports = {
   getDepartments: async (req, res) => {
     try {
       const authUserId = req.authUserId;
-    //   console.log(authUserId, "id from middleware");
+      //   console.log(authUserId, "id from middleware");
 
       const user = await User.findOne(
         {
@@ -93,7 +93,7 @@ module.exports = {
         { verified: 1, role: 1 }
       );
 
-    //   console.log(user, "getting user");
+      //   console.log(user, "getting user");
 
       if (user && user.verified !== null) {
         const response = await Department.find();
@@ -127,10 +127,10 @@ module.exports = {
   deleteDepartment: async (req, res) => {
     try {
       const authUserId = req.authUserId;
-    //   console.log(authUserId, "id from middleware");
+      //   console.log(authUserId, "id from middleware");
 
-      const {departmentId}  = req.query;
-    //   console.log(departmentId, "Department id");
+      const { departmentId } = req.query;
+      //   console.log(departmentId, "Department id");
 
       if (!departmentId) {
         return res.status(Constant.INTERNAL_SERVER).json({
@@ -146,7 +146,7 @@ module.exports = {
         { verified: 1, role: 1 }
       );
 
-    //   console.log(user, "getting user");
+      //   console.log(user, "getting user");
 
       if (user && user.verified !== null) {
         if (user.role === Constant.ROLE.MANAGER) {
@@ -163,6 +163,132 @@ module.exports = {
             message: "You are not manager",
           });
         }
+      } else {
+        return res.status(Constant.FAIL).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  /**
+   * @description This function is used to asign employees to task and department
+   * @param req
+   * @param res
+   */
+
+  assignEmployees: async (req, res) => {
+    try {
+      const authUserId = req.authUserId;
+      console.log(authUserId, "id from middleware");
+
+      const { departmentId } = req.params.id;
+      console.log(departmentId, "getting department id");
+
+      if (!departmentId) {
+        return res.status(Constant.INTERNAL_SERVER).json({
+          success: false,
+          message: "departmentId not found",
+        });
+      }
+
+      const { employeesId } = req.body;
+      console.log(employeesId, "Department id");
+
+      if (!employeesId) {
+        return res.status(Constant.INTERNAL_SERVER).json({
+          success: false,
+          message: "employeesId not found",
+        });
+      }
+
+      const user = await User.findOne(
+        {
+          $and: [{ status: Constant.ACTIVE }, { _id: authUserId }],
+        },
+        { verified: 1, role: 1 }
+      );
+
+      console.log(user, "getting user");
+
+      if (user && user.verified !== null) {
+        if (user.role === Constant.ROLE.MANAGER) {
+          const employees = await User.find({
+            _id: { $in: employeesId },
+            role: "user",
+          });
+          if (employees.length !== employeesId.length) {
+            return res
+              .status(400)
+              .json({ success: false, message: "Some employees not found." });
+          }
+          const updatedDepartment = await Department.findByIdAndUpdate(
+            departmentId,
+            { $set: { employees: employeesId } },
+            { new: true }
+          ).populate("employees", "name email");
+
+          res.status(Constant.SUCCESS).json({
+            success: true,
+            data: updatedDepartment,
+            message: "Employees assigned",
+          });
+        } else {
+          return res.status(Constant.FAIL).json({
+            success: false,
+            message: "You are not manager",
+          });
+        }
+      } else {
+        return res.status(Constant.FAIL).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(Constant.INTERNAL_SERVER).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  /**
+   * @desccription This function is used to get all employees
+   * @param req
+   * @param res
+   */
+
+  getAllEmployees: async (req, res) => {
+    try {
+      const authUserId = req.authUserId;
+      console.log(authUserId, "id from middleware");
+
+      const user = await User.findOne(
+        {
+          $and: [{ status: Constant.ACTIVE }, { _id: authUserId }],
+        },
+        { verified: 1, role: 1 }
+      );
+
+      console.log(user, "getting user");
+
+      if (user && user.verified !== null) {
+        const response = await User.find({ role: Constant.ROLE.USER });
+
+        return res.status(Constant.SUCCESS).json({
+          success: true,
+          data: response,
+          message: "User not found",
+        });
       } else {
         return res.status(Constant.FAIL).json({
           success: false,

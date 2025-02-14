@@ -60,7 +60,12 @@ export function login(formData, navigate) {
 
       localStorage.setItem("token", JSON.stringify(response.data.user.token));
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/dashboard");
+      const role = response.data.user.role;
+      if (role === "user") {
+        navigate("/dashboard-user");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.log("LOGIN API ERROR............", error);
       toast.error("Login Failed");
@@ -69,3 +74,37 @@ export function login(formData, navigate) {
     toast.dismiss(toastId);
   };
 }
+
+export const logout = (userId, navigate) => {
+  return async (dispatch) => {
+    const toastId = toast.loading("Loading...");
+    dispatch(setLoading(true));
+
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/auth/logout?userId=${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+      dispatch(setToken(null));
+      dispatch(setUser(null));
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      toast.success("Logout Successful");
+      navigate("/login");
+    } catch (error) {
+      console.log("Logout API ERROR............", error);
+      toast.error("Logout Failed");
+    }
+    dispatch(setLoading(false));
+    toast.dismiss(toastId);
+  };
+};

@@ -96,7 +96,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { requestParams } = req.body;
-      console.log(requestParams, "LOGIN");
+      // console.log(requestParams, "LOGIN");
 
       if (!requestParams.email || !requestParams.password) {
         return res.status(Constant.FAIL).json({
@@ -113,8 +113,9 @@ module.exports = {
           // console.log(user, "USERDATA");
 
           if (
-            (user && user?.role === Constant.ROLE.USER) ||
-            Constant.ROLE.MANAGER
+            user &&
+            (user.role === Constant.ROLE.USER ||
+              user.role === Constant.ROLE.MANAGER)
           ) {
             if (user && user.verified !== null) {
               if (user && user?.status === Constant.ACTIVE) {
@@ -133,23 +134,24 @@ module.exports = {
                   };
 
                   const token = issueToken(payload);
-                  //   console.log(token, "GETTING TOKEN");
+                  // console.log(token, "GETTING TOKEN");
 
                   await user.updateOne(
-                    { _id: user._id },
+                    { _id: user?._id },
                     {
                       $set: {
                         last_login: new Date(),
                         token,
                         tokenExpiresAt: userExpTime,
                       },
-                    }
+                    },
+                    { new: true }
                   );
 
                   return res.status(Constant.SUCCESS).json({
                     success: true,
                     user,
-                    message: "Account is Inactive",
+                    message: "Login successfull",
                   });
                 } else {
                   return res.status(Constant.UNAUTHORIZED).json({
@@ -194,13 +196,13 @@ module.exports = {
 
   logout: async (req, res) => {
     try {
-      const requestParams = req.body;
-      // console.log(requestParams, "LOGOUT");
-      logoutValidation(requestParams, res, async (validate) => {
+      const { userId } = req.query;
+      console.log(userId, "LOGOUT");
+      logoutValidation(userId, res, async (validate) => {
         if (validate) {
           await User.updateOne(
             {
-              _id: requestParams.user_id,
+              _id: userId,
             },
             {
               $set: {

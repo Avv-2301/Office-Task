@@ -54,9 +54,9 @@ module.exports = {
 
   logoutValidation: (req, res, callback) => {
     const schema = Joi.object({
-      user_id: Joi.string().trim().required(),
+      userId: Joi.string().trim().required(),
     });
-    const { error } = schema.validate(req);
+    const { error } = schema.validate(req.body);
     if (error) {
       return res.status(Constant.NOT_ACCEPTABLE).json({
         success: false,

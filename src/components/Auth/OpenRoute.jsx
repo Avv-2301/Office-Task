@@ -1,13 +1,18 @@
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function OpenRoute({ children }) {
-  const { token } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   if (token === null) {
     return children;
   } else {
-    return <Navigate to="/dashboard" />;
+    if (user.role === "user") {
+      navigate("/dashboard-user");
+    } else {
+      navigate("/dashboard");
+    }
   }
 }
 
