@@ -7,7 +7,7 @@ import { signup } from "../services/authApi";
 const Signup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [accountType, setAccountType] = useState("employee");
+  const [accountType, setAccountType] = useState("user");
   const { register, handleSubmit } = useForm();
 
   const handleAccountTypeChange = (type) => {
@@ -25,11 +25,11 @@ const Signup = () => {
         <div className="flex justify-center space-x-4">
           <button
             className={`px-4 py-2 rounded-md focus:outline-none ${
-              accountType === "employee"
+              accountType === "user"
                 ? "bg-indigo-600 text-white"
                 : "bg-gray-200"
             }`}
-            onClick={() => handleAccountTypeChange("employee")}
+            onClick={() => handleAccountTypeChange("user")}
           >
             Employee
           </button>
